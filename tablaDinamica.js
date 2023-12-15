@@ -16,9 +16,6 @@ function crearHeader(propiedades) {
     let tr = document.createElement("tr");
     const header = document.createElement("thead");
     propiedades.forEach((p) => {
-        if (p === "id") {
-            return;
-        }
         const th = document.createElement("th");
         th.textContent = p;
         th.id = p;
@@ -37,9 +34,8 @@ function crearBody(datos, header) {
             const celda = document.createElement("td");
             if (c === "id") {
                 fila.setAttribute("id", obj[c]);
-                return;
             }
-            else if (c === "Modificar") { // CREO BOTON MODIFICAR
+            if (c === "Modificar") { // CREO BOTON MODIFICAR
                 const boton = document.createElement('button');
                 boton.innerText = c;
                 boton.addEventListener('click', () => {

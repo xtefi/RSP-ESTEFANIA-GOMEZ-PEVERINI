@@ -12,7 +12,7 @@ Storage.prototype.getObj = function(key) {
     return JSON.parse(this.getItem(key))
 }
 
-
+crearSpinner();
 const httpHandler = new HttpHandler();
 const personas = httpHandler.sendGetSync();
 

@@ -210,7 +210,7 @@ export function crearFormAlta(formulario) {
         elementos.push(selectorTipo);
     }
 
-    selectorTipo.selectedIndex = opcionesIndices["ElegirTipo"]; // "Elegir tipo"
+    selectorTipo.selectedIndex = opcionesIndices["ElegirTipo"];
     selectorTipo.addEventListener("change", (event) => {
         botonGuardar.disabled = false;
         let nuevosFormFields = [];
@@ -355,4 +355,19 @@ export function crearSelector(opciones) {
         selectorTipo.appendChild(o);
     }
     return selectorTipo;
+}
+
+
+function CrearId(){
+    const http = new HttpHandler();
+    const arrayPersonas = http.sendGetSync();
+    let id = -1;
+    arrayPersonas.forEach((persona) => {
+        if(persona.id > id){
+            id = persona.id +1 ;
+        }
+    });
+    console.log("ID GENERADO: ");
+    console.log(id);
+    return id;
 }
