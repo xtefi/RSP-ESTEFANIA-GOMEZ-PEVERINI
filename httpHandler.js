@@ -25,7 +25,7 @@ export class HttpHandler {
         }
     }
 
-    async sendPutAsync(obj) {
+    sendPutAsync(obj) {
         return new Promise((resolve, reject) =>{
             fetch(GetUrl(), {
                 method: 'PUT',
@@ -38,8 +38,7 @@ export class HttpHandler {
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
                 body: JSON.stringify(obj)
-            })
-            .then(response => {
+            }).then(response => {
                 if(response.ok){
                     resolve(response);
                 }else{
@@ -47,8 +46,7 @@ export class HttpHandler {
                         reject(new Error('Error ' + response.status + ': ' + errorMessage));
                     });
                 }
-            })
-            .catch(error => {
+            }).catch(error => {
                 reject(error);
             });
         });
@@ -73,18 +71,27 @@ export class HttpHandler {
         return response;
     }
     async sendDeleteAsync(obj){
-        return await fetch(GetUrl(), {
-            method: 'DELETE', 
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            redirect: 'follow', 
-            referrerPolicy: 'no-referrer',
-            body: JSON.stringify(obj)
-        });
+        try {
+            const response = await fetch(GetUrl(), {
+                method: 'DELETE',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify(obj)
+            });    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }    
+            return response;
+        } catch (error) {
+            console.error(`Fetch failed: ${error.message}`);
+            return new Response(error.message, { status: error.status ? error.status : 500, statusText: "Internal Server Error" });
+        }
     }
 
 }

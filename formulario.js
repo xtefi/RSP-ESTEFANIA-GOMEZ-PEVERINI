@@ -72,25 +72,29 @@ export function crearFormBaja(formulario, obj) {
         if (obj_a_eliminar) {
             try {                
                 const httpHandler = new HttpHandler();
-
                 crearSpinner();
-                console.log("Antes del fetch");
                 let response = httpHandler.sendDeleteAsync(obj_a_eliminar);
-                response.then(response => response.text())
-                    .then(response => {
+                response.then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                }).then(response => {
                         console.log(response);
                         let LS_Personas = toObjs(localStorage.getObj(entidades));
                         LS_Personas = LS_Personas.filter((elemento) => elemento.id !== obj.id);
-
                         localStorage.removeItem(entidades);
                         localStorage.setObj(entidades, LS_Personas);
                         console.log("Quitando spiner...");
                         quitarSpinner();
-                        const event = new CustomEvent('refrescarTablaPersonas', { detail: LS_Personas });
+                        const event = new CustomEvent('refrescarTablaPersonas');
                         document.dispatchEvent(event);
-                    })
-                    .catch(err => {
-                        console.log(err);
+                    }).catch(err => {
+                        alert(err);
+                        quitarSpinner();
+                        const event = new CustomEvent('refrescarTablaPersonas');
+                        document.dispatchEvent(event);
                     });
             }
             catch (error) {
@@ -160,34 +164,33 @@ export function crearFormUpdate(formulario, obj) {
             objModificado = new Ciudadano(obj.id, inputs["nombre"], inputs["apellido"], inputs["fechaNacimiento"], inputs["dni"]);
         }
         if (objModificado) {
-            try {
-                const httpHandler = new HttpHandler();
+            const httpHandler = new HttpHandler();
 
-                crearSpinner();
-                console.log("Antes del fetch");
-                let response = httpHandler.sendPutAsync(objModificado);
-                response.then(response => {
-                    response.text().then(response => {
-                        let LS_Personas = toObjs(localStorage.getObj(entidades));
-                        LS_Personas = LS_Personas.filter((elemento) => elemento.id !== obj.id);
-                        LS_Personas.push(objModificado);
+            crearSpinner();
+            console.log("Antes del fetch");
 
-                        localStorage.removeItem(entidades);
-                        localStorage.setObj(entidades, LS_Personas);
-                        // siguienteId++;
-                        // localStorage.setItem('nextId', siguienteId);
-                        console.log("Quitando spiner...");
-                        quitarSpinner();
-                        const event = new CustomEvent('refrescarTablaPersonas', { detail: LS_Personas });
-                        document.dispatchEvent(event);
-                    });
+            httpHandler.sendPutAsync(objModificado)
+                .then(response => response.text())
+                .then(responseText => {
+                    let LS_Personas = toObjs(localStorage.getObj(entidades));
+                    LS_Personas = LS_Personas.filter((elemento) => elemento.id !== obj.id);
+                    LS_Personas.push(objModificado);
+
+                    localStorage.removeItem(entidades);
+                    localStorage.setObj(entidades, LS_Personas);
+
+                    console.log("Quitando spiner...");
+                    quitarSpinner();
+
+                    const event = new CustomEvent('refrescarTablaPersonas');
+                    document.dispatchEvent(event);
                 })
-                    .catch(err => {
-                        console.log(err);
-                    })
-            } catch (error) {
-                alert(JSON.stringify(error));
-            }
+                .catch(err => {
+                    alert(err.message);
+                    quitarSpinner();
+                    const event = new CustomEvent('refrescarTablaPersonas');
+                    document.dispatchEvent(event);
+                });
         }
     });
 
